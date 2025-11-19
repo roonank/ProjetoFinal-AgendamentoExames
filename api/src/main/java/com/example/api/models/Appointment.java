@@ -45,6 +45,7 @@ public class Appointment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppoitmentStatus status = AppoitmentStatus.SCHEDULED;
+
     private LocalDateTime createdAt = LocalDateTime.now();
     private String cancelReason;
 

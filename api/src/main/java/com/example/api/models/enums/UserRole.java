@@ -1,5 +1,7 @@
 package com.example.api.models.enums;
 
+import lombok.Getter;
+
 public enum UserRole {
     CLIENT("user"),
     ADMIN("admin");
@@ -10,7 +12,4 @@ public enum UserRole {
         this.role = role;
     }
 
-    public String getRole() {
-        return role;
-    }
 }
