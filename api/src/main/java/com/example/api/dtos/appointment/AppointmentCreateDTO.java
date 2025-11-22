@@ -10,7 +10,7 @@ import java.util.List;
 public class AppointmentCreateDTO {
 
     @NotNull
-    private Long clinicId;
+    private Long LabUnitId;
 
     @NotNull
     private LocalDateTime scheduledAt;

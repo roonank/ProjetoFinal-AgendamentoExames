@@ -1,9 +1,9 @@
 package com.example.api.models.enums;
 
-public enum AppoitmentStatus {
+public enum AppointmentStatus {
     SCHEDULED,
     CONFIRMED,
-    CANCELLED,
+    CANCELED,
     COMPLETED,
     NO_SHOW
 }

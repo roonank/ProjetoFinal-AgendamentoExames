@@ -1,6 +1,6 @@
 package com.example.api.dtos.appointment;
 
-import com.example.api.models.enums.AppoitmentStatus;
+import com.example.api.models.enums.AppointmentStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,14 +13,14 @@ public class AppointmentDetailDTO {
     private Long userId;
     private String userName;
 
-    private Long clinicId;
-    private String clinicName;
-    private String clinicAddress;
+    private Long labUnitId;
+    private String labUnitName;
+    private String labUnitAddress;
 
     private LocalDateTime scheduledAt;
-    private Integer totalDurationMinutes;
+    private Integer totalDurationDays;
 
-    private AppoitmentStatus status;
+    private AppointmentStatus status;
     private String notes;
     private String cancelReason;
 

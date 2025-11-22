@@ -1,8 +1,7 @@
 package com.example.api.models;
 
-import com.example.api.models.enums.AppoitmentStatus;
+import com.example.api.models.enums.AppointmentStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -44,7 +43,7 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AppoitmentStatus status = AppoitmentStatus.SCHEDULED;
+    private AppointmentStatus status = AppointmentStatus.SCHEDULED;
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private String cancelReason;

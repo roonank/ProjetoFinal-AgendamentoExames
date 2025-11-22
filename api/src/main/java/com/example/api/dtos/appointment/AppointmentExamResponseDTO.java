@@ -11,7 +11,7 @@ public class AppointmentExamResponseDTO {
     private Long examId;
     private String examCode;
     private String examName;
-    private Integer durationMinutes;
+    private Integer deliverInDays;
     private String note;
     private BigDecimal price;
     private String status;
