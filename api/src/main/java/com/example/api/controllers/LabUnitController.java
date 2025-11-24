@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,12 +19,16 @@ public class LabUnitController {
 
     private final LabUnitService labUnitService;
 
+    // Somente ADMIN pode criar
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<LabUnitResponseDTO> create(@RequestBody @Valid LabUnitCreateUpdateDTO dto) {
         LabUnitResponseDTO created = labUnitService.createLabUnit(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    // Somente ADMIN pode atualizar
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<LabUnitResponseDTO> update(@PathVariable Long id,
                                                      @RequestBody @Valid LabUnitCreateUpdateDTO dto) {
@@ -31,6 +36,8 @@ public class LabUnitController {
         return ResponseEntity.ok(updated);
     }
 
+    // Somente ADMIN pode deletar
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         labUnitService.deleteLabUnit(id);

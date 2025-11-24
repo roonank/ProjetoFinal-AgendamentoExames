@@ -11,7 +11,7 @@ services:
       - db-data:/var/lib/postgresql/data
       - ./docker-initdb:/docker-entrypoint-initdb.d   # scripts .sql/.sh para inicializar (opcional)
     ports:
-      - "5432:5432"
+      - "5433:5432"
     restart: unless-stopped
 
   adminer:

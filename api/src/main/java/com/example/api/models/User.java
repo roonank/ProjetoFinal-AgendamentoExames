@@ -4,6 +4,8 @@ import com.example.api.models.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -37,7 +39,8 @@ public class User {
 
     private String cpf;
 
-    @NotBlank
+    @NotNull
+    @Past
     private LocalDate birthDate;
 
     private String gender;
@@ -54,5 +57,5 @@ public class User {
     private boolean active = true;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 }

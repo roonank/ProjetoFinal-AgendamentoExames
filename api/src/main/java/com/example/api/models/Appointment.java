@@ -32,12 +32,12 @@ public class Appointment {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "labUnit_id", nullable = false)
+    @JoinColumn(name = "labUnit_id", nullable = false)
     private LabUnit labUnit;
 
     @NotNull
     @Column(name = "scheduled_at", nullable = false)
-    private LocalDateTime scheduletAt;
+    private LocalDateTime scheduledAt;
 
     private Integer totalDurationDays;
 

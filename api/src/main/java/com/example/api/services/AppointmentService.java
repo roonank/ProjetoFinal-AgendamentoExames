@@ -51,7 +51,7 @@ public class AppointmentService {
         Appointment appointment = new Appointment();
         appointment.setUser(user);
         appointment.setLabUnit(labUnit);
-        appointment.setScheduletAt(dto.getScheduledAt());
+        appointment.setScheduledAt(dto.getScheduledAt());
         appointment.setStatus(AppointmentStatus.SCHEDULED);
         appointment.setNotes(dto.getNotes());
         appointment.setCreatedAt(LocalDateTime.now());
@@ -70,6 +70,8 @@ public class AppointmentService {
         appointment.setTotalDurationDays(totalDuration);
 
         appointmentRepository.save(appointment);
+
+        eventAppointmentCreated(appointment);
 
         return toDetailDTO(appointment);
     }
@@ -152,7 +154,7 @@ public class AppointmentService {
     public AppointmentSummaryDTO toSummaryDTO(Appointment appointment){
         AppointmentSummaryDTO dto = new AppointmentSummaryDTO();
         dto.setId(appointment.getId());
-        dto.setScheduledAt(appointment.getScheduletAt());
+        dto.setScheduledAt(appointment.getScheduledAt());
         dto.setStatus(appointment.getStatus());
         dto.setLabUnitName(appointment.getLabUnit().getName());
 
@@ -174,7 +176,7 @@ public class AppointmentService {
         dto.setLabUnitName(appointment.getLabUnit().getName());
         dto.setLabUnitAddress(appointment.getLabUnit().getAddress());
 
-        dto.setScheduledAt(appointment.getScheduletAt());
+        dto.setScheduledAt(appointment.getScheduledAt());
         dto.setTotalDurationDays(appointment.getTotalDurationDays());
         dto.setStatus(appointment.getStatus());
         dto.setNotes(appointment.getNotes());
@@ -210,7 +212,14 @@ public class AppointmentService {
                 appointment.getId(),
                 appointment.getUser().getId(),
                 appointment.getLabUnit().getId(),
-                appointment.getScheduletAt()
+                appointment.getScheduledAt(),
+                appointment.getUser().getEmail(),
+                appointment.getUser().getFullName(),
+                appointment.getLabUnit().getName(),
+                appointment.getLabUnit().getAddress(),
+                appointment.getExams().stream()
+                        .map(item -> item.getExam().getName())
+                        .toList()
         );
 
         rabbitTemplate.convertAndSend(exchange, routingkey, event);

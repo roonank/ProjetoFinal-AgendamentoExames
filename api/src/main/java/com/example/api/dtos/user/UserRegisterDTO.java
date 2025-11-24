@@ -7,16 +7,13 @@ import lombok.Data;
 @Data
 public class UserRegisterDTO {
 
-    @Email
-    @NotBlank
-    private String email;
-
-    @NotBlank
-    private String password;
-
-    @NotBlank
-    private String fullName;
-
-    private String phone;
+    @NotBlank String fullName;
+    @NotBlank String email;
+    @NotBlank String password;
+    @NotBlank String cpf;
+    @NotBlank String phone;
+    @NotBlank String birthDate;
+    String address;
+    String gender;
 }
 
