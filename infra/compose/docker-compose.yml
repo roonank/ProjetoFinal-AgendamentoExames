@@ -3,13 +3,12 @@ services:
     image: postgres:13
     container_name: agendamento_postgres
     environment:
-      - POSTGRES_DB=agendamento_db
-      - POSTGRES_USER=agendamento_user
-      - POSTGRES_PASSWORD=agendamento_password
-      
+      POSTGRES_DB: agendamento_db
+      POSTGRES_USER: agendamento_user
+      POSTGRES_PASSWORD: agendamento_password
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./docker-initdb:/docker-entrypoint-initdb.d   # scripts .sql/.sh para inicializar (opcional)
+      - ./docker-initdb:/docker-entrypoint-initdb.d
     ports:
       - "5433:5432"
     restart: unless-stopped
@@ -30,10 +29,30 @@ services:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
     ports:
-      - "5672:5672"       # porta AMQP para os serviços conectarem
-      - "15672:15672"     # painel de gerenciamento
+      - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ../../api
+      dockerfile: Dockerfile
+    container_name: agendamento_api
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/agendamento_db
+      SPRING_DATASOURCE_USERNAME: agendamento_user
+      SPRING_DATASOURCE_PASSWORD: agendamento_password
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: admin
+      SPRING_RABBITMQ_PASSWORD: admin
+    ports:
+      - "8081:8081"
     restart: unless-stopped
 
 volumes:

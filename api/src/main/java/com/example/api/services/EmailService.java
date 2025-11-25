@@ -15,9 +15,6 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.mail.from}")
-    private String from;
-
     public void sendAppointmentCreatedEmail(String to,
                                             String userName,
                                             String labName,
