@@ -1,0 +1,34 @@
+<aside class="h-screen w-64 bg-slate-900 text-slate-100 flex flex-col">
+  <div class="h-16 flex items-center px-4 border-b border-slate-800">
+    <span class="text-lg font-semibold">Check-In Lab</span>
+  </div>
+
+  <nav class="flex-1 px-2 py-4 space-y-1 text-sm">
+    <a routerLink="/dashboard/appointments" routerLinkActive="bg-slate-800"
+        class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 transition">
+        📅 Agendamentos
+    </a>
+
+    <a *ngIf="isAdmin"
+        routerLink="/dashboard/exams" routerLinkActive="bg-slate-800"
+        class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 transition">
+        🧪 Exames
+    </a>
+
+    <a *ngIf="isAdmin"
+        routerLink="/dashboard/lab-units" routerLinkActive="bg-slate-800"
+        class="flex items-center px-3 py-2 rounded-lg hover:bg-slate-800 transition">
+        🏥 Unidades
+    </a>
+  </nav>
+
+  <div class="border-t border-slate-800 px-4 py-3 text-xs text-slate-400">
+    <div class="font-medium text-slate-200">
+      {{ user?.fullName || 'Usuário' }}
+    </div>
+    <div>
+      Perfil:
+      <span class="uppercase">{{ user?.role || 'N/A' }}</span>
+    </div>
+  </div>
+</aside>
