@@ -33,7 +33,7 @@ Administradores podem gerenciar **exames**, **unidades de laboratório**.
 - ├── api/ # Aplicação Spring Boot (API)
 - ├── frontend/ # Aplicação Angular
 - └── infra/
--    └── compose/
+-     └── compose/
 -         └── docker-compose.yml
 
 
