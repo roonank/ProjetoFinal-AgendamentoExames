@@ -18,7 +18,7 @@ public class ExamCreateUpdateDTO {
     private String description;
 
     @PositiveOrZero
-    private Integer DeliverTimeInDays;
+    private Integer deliverTimeInDays;
 
     private String instructions;
 

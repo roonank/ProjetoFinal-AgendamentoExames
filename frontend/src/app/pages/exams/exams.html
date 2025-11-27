@@ -1,1 +1,195 @@
-<p>exams works!</p>
+<div class="space-y-6">
+    <!-- Formulário -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-medium mb-4">
+            {{ editingId ? 'Editar exame' : 'Cadastrar novo exame' }}
+        </h2>
+
+        <form [formGroup]="examForm" (ngSubmit)="submit()" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Mnemônico
+                    </label>
+                    <input
+                        formControlName="code"
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Nome
+                    </label>
+                    <input
+                        formControlName="name"
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Descrição
+                </label>
+                <textarea
+                    formControlName="description"
+                    rows="2"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                ></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Prazo de entrega (dias)
+                    </label>
+                    <input
+                        type="number"
+                        formControlName="deliverTimeInDays"
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Preço (R$)
+                    </label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        formControlName="price"
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">
+                    Instruções para o paciente
+                </label>
+                <textarea
+                    formControlName="instructions"
+                    rows="2"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                ></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <span class="text-sm text-red-500" *ngIf="errorMessage">
+                    {{ errorMessage }}
+                </span>
+
+                <div class="space-x-2 ml-auto">
+                    <button
+                        type="button"
+                        (click)="resetForm()"
+                        class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                    >
+                        Limpar
+                    </button>
+
+                    <button
+                        type="submit"
+                        [disabled]="saving"
+                        class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
+                    >
+                        {{ editingId ? 'Salvar alterações' : 'Cadastrar exame' }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-medium mb-4">Exames cadastrados</h2>
+
+        <div *ngIf="loading" class="text-sm text-slate-500">
+            Carregando exames...
+        </div>
+
+        <table *ngIf="!loading && exams.length" class="min-w-full text-sm">
+            <thead>
+                <tr class="border-b">
+                    <th class="text-left py-2 pr-4">Mnemônico</th>
+                    <th class="text-left py-2 pr-4">Nome</th>
+                    <th class="text-left py-2 pr-4">Prazo (dias)</th>
+                    <th class="text-left py-2 pr-4">Preço</th>
+                    <th class="text-right py-2">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let exam of exams" class="border-b last:border-0">
+                    <td class="py-2 pr-4">{{ exam.code }}</td>
+                    <td class="py-2 pr-4">{{ exam.name }}</td>
+                    <td class="py-2 pr-4">
+                        {{ exam.deliverTimeInDays ?? '-' }}
+                    </td>
+                    <td class="py-2 pr-4">
+                        {{ exam.price | currency : 'BRL' : 'symbol' : '1.2-2' }}
+                    </td>
+                    <td class="py-2 text-right space-x-2">
+                        <div class="flex gap-2 justify-end">    
+                            <button
+                                (click)="edit(exam)"
+                                class="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border 
+                                    border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white 
+                                    transition-all duration-200">
+                                Editar
+                            </button>
+                            <button
+                                (click)="openDeleteModal(exam)"
+                                class="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border 
+                                    border-red-500 text-red-600 hover:bg-red-500 hover:text-white 
+                                    transition-all duration-200">
+                                Excluir
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div
+            *ngIf="showDeleteModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+        >
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                <h3 class="text-lg font-semibold text-slate-800 mb-2">
+                    Confirmar exclusão
+                </h3>
+
+                <p class="text-sm text-slate-600 mb-4">
+                    Tem certeza que deseja excluir o exame
+                    <span class="font-semibold">"{{ examToDelete?.name }}"</span>
+                    (código: {{ examToDelete?.code }})?
+                    <br />
+                    Esta ação não poderá ser desfeita.
+                </p>
+
+                <div class="flex justify-end space-x-2">
+                    <button
+                        type="button"
+                        (click)="closeDeleteModal()"
+                        class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        (click)="confirmDelete()"
+                        class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700"
+                    >
+                        Excluir exame
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <p *ngIf="!loading && !exams.length" class="text-sm text-slate-500">
+            Nenhum exame cadastrado ainda.
+        </p>
+    </div>
+</div>

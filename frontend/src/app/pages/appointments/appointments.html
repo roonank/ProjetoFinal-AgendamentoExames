@@ -1,1 +1,290 @@
-<p>appointments works!</p>
+<div class="space-y-6">
+    <h1 class="text-2xl font-semibold text-slate-800">Fazer agendamento</h1>
+
+    <!-- Formulário de novo agendamento -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-medium mb-4">Novo agendamento</h2>
+
+        <form [formGroup]="appointmentForm" (ngSubmit)="submit()" class="space-y-4">
+            <!-- Unidade + Data/hora -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Unidade de laboratório
+                    </label>
+                    <select
+                        formControlName="labUnitId"
+                        class="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    >
+                        <option value="">Selecione uma unidade</option>
+                        <option *ngFor="let unit of labUnits" [value]="unit.id">
+                            {{ unit.name }} - {{ unit.address || '' }}
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">
+                        Data e horário do exame
+                    </label>
+                    <input
+                         
+                        type="datetime-local"
+                        formControlName="scheduledAt"
+                        class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                </div>
+            </div>
+
+            <!-- Notas -->
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Observações (opcional)</label>
+                <textarea
+                    formControlName="notes"
+                    rows="2"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                ></textarea>
+            </div>
+
+            <!-- Seção de exames -->
+            <div class="border rounded-xl p-4 space-y-3">
+                <h3 class="text-sm font-semibold text-slate-800">
+                    Exames do agendamento
+                </h3>
+
+                <!-- Campo fixo para escolher exame + observação -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-medium text-slate-600 mb-1">
+                            Exame
+                        </label>
+                        <select
+                            [(ngModel)]="selectedExamId"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="w-full border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        >
+                            <option [ngValue]="null">Selecione um exame</option>
+                            <option *ngFor="let exam of exams" [ngValue]="exam.id">
+                                {{ exam.code }} - {{ exam.name }}
+                            </option>
+
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">
+                            Observação (opcional)
+                        </label>
+                        <input
+                            [(ngModel)]="selectedExamNote"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button
+                        type="button"
+                        (click)="addExam()"
+                        class="px-4 py-1.5 text-xs rounded-lg border border-emerald-500 text-emerald-700 hover:bg-emerald-500 hover:text-white transition"
+                    >
+                        + Adicionar exame
+                    </button>
+                </div>
+
+                <!-- Lista de exames adicionados -->
+                <div *ngIf="examsToAdd.length" class="space-y-2">
+                    <div
+                        *ngFor="let exam of examsToAdd; let i = index"
+                        class="flex items-center justify-between text-xs bg-slate-50 rounded-lg px-3 py-2"
+                    >
+                        <div>
+                            <div class="font-medium">
+                                {{ getExamName(exam.examId) }}
+                            </div>
+                            <div class="text-slate-500" *ngIf="exam.note">
+                                Obs: {{ exam.note }}
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            (click)="removeExam(i)"
+                            class="text-red-500 hover:underline"
+                        >
+                            remover
+                        </button>
+                    </div>
+                </div>
+
+                <p *ngIf="!examsToAdd.length" class="text-xs text-slate-500">
+                    Nenhum exame adicionado ainda. Selecione um exame acima e clique em
+                    "Adicionar exame".
+                </p>
+            </div>
+
+            <!-- Erros + Ações -->
+            <div class="flex items-center justify-between pt-2">
+                <span class="text-sm text-red-500" *ngIf="errorMessage">{{ errorMessage }}</span>
+
+                <div class="space-x-2 ml-auto">
+                    <button
+                        type="button"
+                        (click)="resetForm()"
+                        class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                    >
+                        Limpar
+                    </button>
+
+                    <button
+                        type="submit"
+                        [disabled]="saving"
+                        class="px-4 py-2 text-sm rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
+                    >
+                        Confirmar agendamento
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de agendamentos -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h2 class="text-lg font-medium mb-4">Meus agendamentos</h2>
+
+        <div *ngIf="loading" class="text-sm text-slate-500">Carregando agendamentos...</div>
+
+        <table *ngIf="!loading && appointments.length" class="min-w-full text-sm">
+            <thead>
+                <tr class="border-b">
+                    <th class="text-left py-2 pr-4">Data</th>
+                    <th class="text-left py-2 pr-4">Unidade</th>
+                    <th class="text-left py-2 pr-4">Exames</th>
+                    <th class="text-left py-2 pr-4">Status</th>
+                    <th class="text-right py-2">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let appt of appointments" class="border-b last:border-0">
+                    <td class="py-2 pr-4">{{ appt.scheduledAt | date: 'short' }}</td>
+                    <td class="py-2 pr-4">{{ appt.labUnitName }}</td>
+                    <td class="py-2 pr-4">{{ appt.examNames.join(', ') }}</td>
+                    <td class="py-2 pr-4">
+                        <span class="px-2 py-1 rounded-full text-xs bg-slate-100">{{ appt.status }}</span>
+                    </td>
+                    <td class="py-2 text-right">
+                        <div class="flex gap-2 justify-end">
+                            <button
+                                type="button"
+                                (click)="openDetail(appt.id)"
+                                class="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-slate-400 text-slate-700 hover:bg-slate-100 transition-all duration-200"
+                            >
+                                🔍 Detalhes
+                            </button>
+
+                            <button
+                                type="button"
+                                (click)="openCancelModal(appt)"
+                                class="flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-all duration-200"
+                            >
+                                ❌ Cancelar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p *ngIf="!loading && !appointments.length" class="text-sm text-slate-500">Nenhum agendamento encontrado.</p>
+    </div>
+
+    <!-- Modal de detalhes -->
+    <div
+        *ngIf="showDetailModal && appointmentDetail"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    >
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 max-h-[80vh] overflow-y-auto">
+            <h3 class="text-lg font-semibold text-slate-800 mb-3">Detalhes do agendamento</h3>
+
+            <div class="space-y-2 text-sm">
+                <p><span class="font-medium">Paciente:</span> {{ appointmentDetail.userName }}</p>
+                <p><span class="font-medium">Unidade:</span> {{ appointmentDetail.labUnitName }}</p>
+                <p><span class="font-medium">Endereço:</span> {{ appointmentDetail.labUnitAddress }}</p>
+                <p><span class="font-medium">Data:</span> {{ appointmentDetail.scheduledAt | date: 'short' }}</p>
+                <p><span class="font-medium">Status:</span> {{ appointmentDetail.status }}</p>
+                <p *ngIf="appointmentDetail.notes"><span class="font-medium">Observações:</span> {{ appointmentDetail.notes }}</p>
+                <p *ngIf="appointmentDetail.cancelReason">
+                    <span class="font-medium text-red-600">Motivo do cancelamento:</span> {{ appointmentDetail.cancelReason }}
+                </p>
+            </div>
+
+            <div class="mt-4">
+                <h4 class="text-sm font-semibold mb-2">Exames</h4>
+                <div class="space-y-2">
+                    <div *ngFor="let exam of appointmentDetail.exams" class="border rounded-lg px-3 py-2 text-xs">
+                        <div class="font-medium">{{ exam.examCode }} - {{ exam.examName }}</div>
+                        <div class="text-slate-500">Entrega em {{ exam.deliverInDays }} dia(s) • R$ {{ exam.price }}</div>
+                        <div *ngIf="exam.note" class="text-slate-500">Obs: {{ exam.note }}</div>
+                        <div class="text-slate-500">Status: {{ exam.status }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+                <button
+                    type="button"
+                    (click)="closeDetailModal()"
+                    class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de cancelamento -->
+    <div
+        *ngIf="showCancelModal && appointmentToCancel"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    >
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <h3 class="text-lg font-semibold text-slate-800 mb-2">Cancelar agendamento</h3>
+
+            <p class="text-sm text-slate-600 mb-3">
+                Tem certeza que deseja cancelar o agendamento na unidade
+                <span class="font-semibold">{{ appointmentToCancel.labUnitName }}</span>
+                no dia
+                <span class="font-semibold">{{ appointmentToCancel.scheduledAt | date:'short' }}</span>?
+            </p>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Motivo do cancelamento (opcional)</label>
+                <textarea
+                    [(ngModel)]="cancelReason"
+                    name="cancelReason"
+                    rows="2"
+                    class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                ></textarea>
+            </div>
+
+            <div class="flex justify-end space-x-2">
+                <button
+                    type="button"
+                    (click)="closeCancelModal()"
+                    class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                    Manter agendamento
+                </button>
+
+                <button
+                    type="button"
+                    (click)="confirmCancel()"
+                    class="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700"
+                >
+                    Cancelar agendamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
