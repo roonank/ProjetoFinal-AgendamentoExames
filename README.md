@@ -28,13 +28,13 @@ Administradores podem gerenciar **exames**, **unidades de laboratório**.
 
 ## 📁 Estrutura do Projeto
 
-/ProjetoFinal-AgendamentoExames
-│
-├── api/ # Aplicação Spring Boot (API)
-├── frontend/ # Aplicação Angular
-└── infra/
-    └── compose/
-        └── docker-compose.yml
+- /ProjetoFinal-AgendamentoExames
+- │
+- ├── api/ # Aplicação Spring Boot (API)
+- ├── frontend/ # Aplicação Angular
+- └── infra/
+-    └── compose/
+-         └── docker-compose.yml
 
 
 ---
